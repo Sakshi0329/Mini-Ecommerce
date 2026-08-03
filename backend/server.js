@@ -22,7 +22,7 @@ app.use(
     origin: [
       "http://localhost:5173",
       "http://127.0.0.1:2600",
-      //   "http://192.168.178.148:5173", accepeting mobile request used ip
+      https://mini-ecommerce-frontend-git3.onrender.com
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
