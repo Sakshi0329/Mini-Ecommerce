@@ -100,5 +100,9 @@ const orderSchema = new mongoose.Schema(
     timestamps: true,
   },
 );
+// Add these indexes
+orderSchema.index({ user: 1 });
+orderSchema.index({ createdAt: -1 });
+orderSchema.index({ user: 1, createdAt: -1 });
 
 export default mongoose.model("Order", orderSchema);
