@@ -7,7 +7,7 @@ const AdminOrders = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
 
-  const ordersPerPage = 30;
+  const ordersPerPage = 12;
   const indexOfLastOrder = currentPage * ordersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
 
@@ -64,233 +64,158 @@ const AdminOrders = () => {
   return (
     <div className="container py-4">
       <h2 className="mb-4 fw-bold">All Orders</h2>
-
-      {orders.length === 0 ? (
-        <h4>No Orders Found</h4>
-      ) : (
-        <>
-          {/* Order IDs */}
-          <div className="row g-3 mb-4">
-            {currentOrders.map((order) => (
-              <div className="col-lg-2 col-md-3 col-sm-4 col-6" key={order._id}>
+      <>
+        <div className="row g-4">
+          {currentOrders.map((order) => (
+            <div
+              className="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12"
+              key={order._id}
+            >
+              <div
+                className="card shadow-sm border-0 h-100 position-relative"
+                style={{ borderRadius: "15px" }}
+              >
                 <button
-                  className={`btn w-100 ${
-                    selectedOrder === order._id
-                      ? "btn-primary"
-                      : "btn-outline-primary"
-                  }`}
-                  onClick={() =>
-                    setSelectedOrder(
-                      selectedOrder === order._id ? null : order._id,
-                    )
-                  }
-                >
-                  #{order._id.slice(-6)}
-                </button>
-              </div>
-            ))}
-          </div>
-
-          {/* Selected Order */}
-          {selectedOrder &&
-            orders
-              .filter((order) => order._id === selectedOrder)
-              .map((order) => (
-                <div
-                  key={order._id}
-                  className="card shadow mx-auto"
+                  className="btn btn-danger btn-sm position-absolute"
                   style={{
-                    maxWidth: "650px",
-                    borderRadius: "12px",
+                    top: "10px",
+                    right: "10px",
+                    width: "30px",
+                    height: "30px",
+                    borderRadius: "50%",
+                    padding: "0",
+                    zIndex: 10,
                   }}
+                  onClick={() => removeOrder(order._id)}
                 >
-                  <div className="card-body py-2 px-3 position-relative">
-                    <button
-                      className="btn btn-danger btn-sm position-absolute"
-                      style={{
-                        top: "10px",
-                        right: "10px",
-                        width: "32px",
-                        height: "32px",
-                        borderRadius: "50%",
-                        padding: "0",
-                        fontWeight: "bold",
-                      }}
-                      onClick={() => removeOrder(order._id)}
-                    >
-                      ✕
-                    </button>
-                    <div className="row g-2">
-                      {/* LEFT SIDE */}
-                      <div className="col-md-6 pe-2">
-                        <h5 className="fw-bold mb-2">Order Details</h5>
+                  ✕
+                </button>
 
-                        <p>
-                          <strong>Order ID:</strong>
-                          <br />
-                          <span className="text-break">{order._id}</span>
-                        </p>
+                <div className="card-body">
+                  <div className="row">
+                    {/* LEFT SIDE */}
+                    <div className="col-md-6 border-end">
+                      <h5 className="fw-bold mb-3">
+                        {order.user?.name || "Customer"}
+                      </h5>
 
-                        <hr className="my-2" />
+                      <p className="mb-1">
+                        <strong>Email:</strong>
+                        <br />
+                        {order.user?.email}
+                      </p>
 
-                        <h6 className="fw-bold mb-2">Customer</h6>
+                      <hr />
 
-                        <p className="mb-0">
-                          <strong>Name:</strong> {order.user?.name}
-                        </p>
+                      <div className="row text-center mb-3">
+                        <div className="col-6 border-end">
+                          <small className="text-muted">Payment</small>
 
-                        <p className="mb-1">
-                          <strong>Email:</strong> {order.user?.email}
-                        </p>
-
-                        <hr />
-
-                        <h6 className="fw-bold">Shipping Address</h6>
-
-                        <p className="mb-0">{order.shippingAddress.fullName}</p>
-
-                        <p className="mb-0">{order.shippingAddress.phone}</p>
-
-                        <p className="mb-0">{order.shippingAddress.address}</p>
-
-                        <p className="mb-0">
-                          {order.shippingAddress.city},{" "}
-                          {order.shippingAddress.state}
-                        </p>
-
-                        <p>{order.shippingAddress.pincode}</p>
-                      </div>
-
-                      {/* RIGHT SIDE */}
-                      <div className="col-md-6 ps-2">
-                        <h5 className="fw-bold mb-3">Products</h5>
-
-                        {(expandedProducts[order._id]
-                          ? order.products
-                          : order.products.slice(0, 3)
-                        ).map((item) => (
-                          <div
-                            key={item.product}
-                            className="d-flex align-items-center mb-2"
-                          >
-                            <img
-                              src={item.image}
-                              alt={item.name}
-                              style={{
-                                width: "50px",
-                                height: "50px",
-                                objectFit: "cover",
-                                borderRadius: "8px",
-                                marginRight: "12px",
-                              }}
-                            />
-
-                            <div>
-                              <h6 className="mb-0">{item.name}</h6>
-
-                              <small>
-                                ₹{item.price} × {item.quantity}
-                              </small>
-                            </div>
-                          </div>
-                        ))}
-                        {order.products.length > 3 && (
-                          <div className="text-center mt-2">
-                            <button
-                              className="btn btn-sm btn-outline-primary"
-                              onClick={() =>
-                                setExpandedProducts((prev) => ({
-                                  ...prev,
-                                  [order._id]: !prev[order._id],
-                                }))
-                              }
-                            >
-                              {expandedProducts[order._id]
-                                ? "Show Less ▲"
-                                : `Show ${order.products.length - 3} More ▼`}
-                            </button>
-                          </div>
-                        )}
-                        <hr />
-
-                        <div className="mb-3">
-                          <h6 className="fw-bold">Payment Details</h6>
-
-                          <p className="mb-1">
-                            <strong>Method:</strong> {order.paymentMethod}
-                          </p>
-
-                          {order.paymentMethod === "COD" && (
-                            <p className="text-success mb-0">
-                              Cash will be collected on delivery.
-                            </p>
-                          )}
-
-                          {order.paymentMethod === "UPI" && (
-                            <>
-                              <p className="mb-1">
-                                <strong>UPI ID:</strong>{" "}
-                                {order.paymentDetails?.upiId || "Not Available"}
-                              </p>
-
-                              <p className="text-success mb-0">
-                                Payment via UPI
-                              </p>
-                            </>
-                          )}
-
-                          {order.paymentMethod === "Card" && (
-                            <>
-                              <p className="mb-1">
-                                <strong>Card Holder:</strong>{" "}
-                                {order.paymentDetails?.cardHolder ||
-                                  "Not Available"}
-                              </p>
-
-                              <p className="mb-1">
-                                <strong>Card Number:</strong>{" "}
-                                {order.paymentDetails?.cardNumber
-                                  ? "**** **** **** " +
-                                    order.paymentDetails.cardNumber.slice(-4)
-                                  : "Not Available"}
-                              </p>
-
-                              <p className="text-success mb-0">Card Payment</p>
-                            </>
-                          )}
+                          <h6>{order.paymentMethod}</h6>
                         </div>
 
-                        <hr />
-                        <div className="d-flex justify-content-between align-items-center mb-3">
-                          <strong>Status</strong>
+                        <div className="col-6">
+                          <small className="text-muted">Total</small>
 
-                          <select
-                            className="form-select"
-                            style={{ width: "130px", height: "35px" }}
-                            value={order.orderStatus}
-                            onChange={(e) =>
-                              changeStatus(order._id, e.target.value)
+                          <h5 className="text-success">₹{order.totalAmount}</h5>
+                        </div>
+                      </div>
+
+                      <hr />
+
+                      <h6 className="fw-bold">Shipping</h6>
+
+                      <p className="mb-1">{order.shippingAddress.fullName}</p>
+
+                      <p className="mb-1">{order.shippingAddress.phone}</p>
+
+                      <p className="mb-1">{order.shippingAddress.address}</p>
+
+                      <p className="mb-1">
+                        {order.shippingAddress.city},{" "}
+                        {order.shippingAddress.state}
+                      </p>
+
+                      <p className="mb-0">{order.shippingAddress.pincode}</p>
+                    </div>
+
+                    {/* RIGHT SIDE */}
+
+                    <div className="col-md-6">
+                      <h5 className="fw-bold mb-3">Products</h5>
+
+                      {(expandedProducts[order._id]
+                        ? order.products
+                        : order.products.slice(0, 3)
+                      ).map((item) => (
+                        <div
+                          key={item.product}
+                          className="d-flex align-items-center mb-3"
+                        >
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            style={{
+                              width: "60px",
+                              height: "60px",
+                              objectFit: "cover",
+                              borderRadius: "8px",
+                            }}
+                          />
+
+                          <div className="ms-3">
+                            <h6 className="mb-1">{item.name}</h6>
+
+                            <small>
+                              ₹{item.price} × {item.quantity}
+                            </small>
+                          </div>
+                        </div>
+                      ))}
+
+                      {order.products.length > 3 && (
+                        <div className="text-center mb-3">
+                          <button
+                            className="btn btn-outline-primary btn-sm"
+                            onClick={() =>
+                              setExpandedProducts((prev) => ({
+                                ...prev,
+                                [order._id]: !prev[order._id],
+                              }))
                             }
                           >
-                            <option value="Pending">Pending</option>
-                            <option value="Processing">Processing</option>
-                            <option value="Shipped">Shipped</option>
-                            <option value="Delivered">Delivered</option>
-                          </select>
+                            {expandedProducts[order._id]
+                              ? "Show Less ▲"
+                              : `Show ${order.products.length - 3} More ▼`}
+                          </button>
                         </div>
+                      )}
 
-                        <div className="d-flex justify-content-between">
-                          <strong>Total</strong>
+                      <hr />
 
-                          <strong className="text-success">
-                            ₹{order.totalAmount}
-                          </strong>
-                        </div>
-                      </div>
+                      <h6 className="fw-bold">Order Status</h6>
+
+                      <select
+                        className="form-select"
+                        value={order.orderStatus}
+                        onChange={(e) =>
+                          changeStatus(order._id, e.target.value)
+                        }
+                      >
+                        <option value="Pending">Pending</option>
+                        <option value="Processing">Processing</option>
+                        <option value="Shipped">Shipped</option>
+                        <option value="Delivered">Delivered</option>
+                      </select>
                     </div>
                   </div>
                 </div>
-              ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {totalPages > 1 && (
           <div className="d-flex justify-content-center mt-4">
             <nav>
               <ul className="pagination">
@@ -336,8 +261,8 @@ const AdminOrders = () => {
               </ul>
             </nav>
           </div>
-        </>
-      )}
+        )}
+      </>
     </div>
   );
 };
