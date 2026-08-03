@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import Slider from "react-slick";
 import { useLocation } from "react-router";
 import { fetchProducts } from "../services/api";
-import ProductCard from "../Components/ProductCard";
+import ProductCard from "../components/ProductCard";
 
 import Beauty from "../Image/Beauty.jpg";
 import Accessories from "../Image/Accessories.avif";
@@ -47,7 +47,7 @@ export const Home = () => {
 
       const { data } = await fetchProducts(searchQuery);
 
-      console.log("Products:", data);
+      // console.log("Products:", data);
 
       setProducts(data);
     } catch (err) {
