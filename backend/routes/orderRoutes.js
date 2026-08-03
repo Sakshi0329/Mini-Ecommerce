@@ -101,7 +101,6 @@ router.get("/my", auth, async (req, res) => {
     });
   }
 });
-
 router.delete("/:id", auth, async (req, res) => {
   try {
     const order = await Order.findOne({
