@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { registerUser, verifyOTP } from "../services/api"; // verifyOTP import kiya
+import { registerUser, verifyOTP } from "../services/api"; 
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
