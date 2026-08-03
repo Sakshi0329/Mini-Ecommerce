@@ -26,7 +26,7 @@ app.use(
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
-  })
+  }),
 );
 // Body Parsers
 app.use(express.json({ limit: "50mb" }));
