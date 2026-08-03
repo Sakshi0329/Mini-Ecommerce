@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { fetchProducts } from "../services/api";
-import ProductCard from "../components/ProductCard";
+import ProductCard from "../Components/ProductCard";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
