@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { getMyOrders, deleteOrder } from "../services/api";
+import { getMyOrders } from "../services/api";
 import Swal from "sweetalert2";
 
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedProducts, setExpandedProducts] = useState({});
-  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const ordersPerPage = 12;
 
   useEffect(() => {
     fetchOrders();
@@ -15,7 +17,6 @@ const MyOrders = () => {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-
       const { data } = await getMyOrders();
       setOrders(data.orders || []);
     } catch (error) {
@@ -40,57 +41,23 @@ const MyOrders = () => {
       });
     }
   }, [loading, orders]);
-  // to remove order from my orders
 
-  //   const removeOrder = async (id) => {
-  //   const result = await Swal.fire({
-  //     title: "Remove Order?",
-  //     text: "Are you sure you want to remove this order?",
-  //     icon: "warning",
-  //     showCancelButton: true,
-  //     confirmButtonText: "Yes, Remove",
-  //     cancelButtonText: "Cancel",
-  //     confirmButtonColor: "#dc3545",
-  //     cancelButtonColor: "#6c757d",
-  //     width: "360px",
-  //   });
+  const totalPages = Math.ceil(orders.length / ordersPerPage);
 
-  //   if (!result.isConfirmed) return;
+  const currentOrders = orders.slice(
+    (currentPage - 1) * ordersPerPage,
+    currentPage * ordersPerPage,
+  );
 
-  //   try {
-  //     await deleteOrder(id);
-
-  //     await Swal.fire({
-  //       icon: "success",
-  //       title: "Removed!",
-  //       text: "Order removed successfully.",
-  //       width: "330px",
-  //       timer: 1500,
-  //       showConfirmButton: false,
-  //     });
-
-  //     if (selectedOrder === id) {
-  //       setSelectedOrder(null);
-  //     }
-
-  //     fetchOrders();
-  //   } catch (error) {
-  //     console.log(error);
-
-  //     Swal.fire({
-  //       icon: "error",
-  //       title: "Failed",
-  //       text: "Unable to remove order.",
-  //       width: "330px",
-  //       confirmButtonColor: "#dc3545",
-  //     });
-  //   }
-  // };
   return (
     <div className="container py-4">
-      <h2 className="fw-bold mb-4 text-center">My Orders</h2>
+      <h2 className="fw-bold text-center mb-4">My Orders</h2>
 
-      {orders.length === 0 ? (
+      {loading ? (
+        <div className="text-center mt-5">
+          <div className="spinner-border text-primary"></div>
+        </div>
+      ) : orders.length === 0 ? (
         <div className="text-center mt-5">
           <h4 className="text-muted">No Orders Found</h4>
           <p className="text-secondary">
@@ -99,79 +66,35 @@ const MyOrders = () => {
         </div>
       ) : (
         <>
-          {/* Order IDs */}
-          <div className="row g-3 mb-4">
-            {orders.map((order) => (
-              <div className="col-lg-2 col-md-3 col-sm-4 col-6" key={order._id}>
+          <div className="row g-4">
+            {currentOrders.map((order) => (
+              <div
+                className="col-xl-2-4 col-lg-2-4 col-md-4 col-sm-6 col-12"
+                key={order._id}
+              >
                 <div
-                  className={`card text-center shadow-sm ${
-                    selectedOrder === order._id
-                      ? "border-primary"
-                      : "border-light"
-                  }`}
+                  className="card shadow-sm border-0 h-100"
                   style={{
-                    cursor: "pointer",
-                    borderRadius: "12px",
-                  }}
-                  onClick={() =>
-                    setSelectedOrder(
-                      selectedOrder === order._id ? null : order._id,
-                    )
-                  }
-                >
-                  <div className="card-body p-2">
-                    <div className="fw-bold">#{order._id.slice(-7)}</div>
-
-                    <span
-                      className={`badge mt-2 ${
-                        order.orderStatus === "Delivered"
-                          ? "bg-success"
-                          : order.orderStatus === "Shipped"
-                            ? "bg-info"
-                            : order.orderStatus === "Processing"
-                              ? "bg-warning text-dark"
-                              : "bg-secondary"
-                      }`}
-                    >
-                      {order.orderStatus}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Expanded Order */}
-          {selectedOrder &&
-            orders
-              .filter((order) => order._id === selectedOrder)
-              .map((order) => (
-                <div
-                  className="card shadow-sm border-0 mx-auto"
-                  key={order._id}
-                  style={{
-                    maxWidth: "300px",
                     borderRadius: "15px",
                   }}
                 >
-                  <div className="card-body p-4 position-relative">
-                    {/* if want to remove the cart or orders */}
-                    {/* <button
-                      className="btn btn-sm btn-danger position-absolute"
-                      style={{
-                        top: "10px",
-                        right: "10px",
-                        width: "30px",
-                        height: "30px",
-                        borderRadius: "50%",
-                        padding: "0",
-                        lineHeight: "1",
-                      }}
-                      onClick={() => removeOrder(order._id)}
-                    >
-                      ✕
-                    </button>{" "} */}
-                    {/* Payment + Total */}
+                  <div className="card-body">
+                    <div className="text-center mb-3">
+                      <span
+                        className={`badge ${
+                          order.orderStatus === "Delivered"
+                            ? "bg-success"
+                            : order.orderStatus === "Shipped"
+                              ? "bg-info"
+                              : order.orderStatus === "Processing"
+                                ? "bg-warning text-dark"
+                                : "bg-secondary"
+                        }`}
+                      >
+                        {order.orderStatus}
+                      </span>
+                    </div>
+
                     <div className="row text-center mb-3">
                       <div className="col-6 border-end">
                         <small className="text-muted">Payment</small>
@@ -183,14 +106,17 @@ const MyOrders = () => {
                         <h5 className="text-success">₹{order.totalAmount}</h5>
                       </div>
                     </div>
+
                     <hr />
+
                     <h6 className="fw-bold mb-3">Products</h6>
+
                     {(expandedProducts[order._id]
                       ? order.products
                       : order.products.slice(0, 3)
-                    ).map((item) => (
+                    ).map((item, index) => (
                       <div
-                        key={item.product}
+                        key={index}
                         className="d-flex align-items-center mb-3"
                       >
                         <img
@@ -205,7 +131,14 @@ const MyOrders = () => {
                         />
 
                         <div className="ms-3">
-                          <h6 className="mb-1">{item.name}</h6>
+                          <h6
+                            className="mb-1"
+                            style={{
+                              fontSize: "14px",
+                            }}
+                          >
+                            {item.name}
+                          </h6>
 
                           <small>
                             ₹{item.price} × {item.quantity}
@@ -213,6 +146,7 @@ const MyOrders = () => {
                         </div>
                       </div>
                     ))}
+
                     {order.products.length > 3 && (
                       <div className="text-center">
                         <button
@@ -232,7 +166,33 @@ const MyOrders = () => {
                     )}
                   </div>
                 </div>
-              ))}
+              </div>
+            ))}
+          </div>
+
+          {totalPages > 1 && (
+            <div className="d-flex justify-content-center align-items-center gap-3 mt-5">
+              <button
+                className="btn btn-outline-primary"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((prev) => prev - 1)}
+              >
+                Previous
+              </button>
+
+              <span className="fw-bold">
+                Page {currentPage} of {totalPages}
+              </span>
+
+              <button
+                className="btn btn-outline-primary"
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((prev) => prev + 1)}
+              >
+                Next
+              </button>
+            </div>
+          )}
         </>
       )}
     </div>
