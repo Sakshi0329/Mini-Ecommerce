@@ -73,43 +73,84 @@ const MyOrders = () => {
                 key={order._id}
               >
                 <div
-                  className="card shadow-sm border-0 h-100"
+                  className="card border-0 shadow-lg h-100"
                   style={{
-                    borderRadius: "15px",
+                    borderRadius: "20px",
+                    overflow: "hidden",
+                    transition: "all .3s ease",
+                    cursor: "pointer",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-8px)";
+                    e.currentTarget.style.boxShadow =
+                      "0 20px 40px rgba(0,0,0,0.18)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0px)";
+                    e.currentTarget.style.boxShadow =
+                      "0 .5rem 1rem rgba(0,0,0,.15)";
                   }}
                 >
-                  <div className="card-body">
-                    <div className="text-center mb-3">
+                  {/* Header */}
+                  <div
+                    className="p-3 text-white"
+                    style={{
+                      background:
+                        "linear-gradient(135deg,#4F46E5,#7C3AED,#9333EA)",
+                    }}
+                  >
+                    <div className="d-flex justify-content-between align-items-center">
+                      <div>
+                        <small className="opacity-75">Order</small>
+                        <div className="fw-bold">
+                          #{order._id.slice(-6).toUpperCase()}
+                        </div>
+                      </div>
+
                       <span
-                        className={`badge ${
+                        className={`badge rounded-pill px-3 py-2 ${
                           order.orderStatus === "Delivered"
                             ? "bg-success"
                             : order.orderStatus === "Shipped"
                               ? "bg-info"
                               : order.orderStatus === "Processing"
                                 ? "bg-warning text-dark"
-                                : "bg-secondary"
+                                : "bg-light text-dark"
                         }`}
                       >
                         {order.orderStatus}
                       </span>
                     </div>
+                  </div>
 
-                    <div className="row text-center mb-3">
-                      <div className="col-6 border-end">
-                        <small className="text-muted">Payment</small>
-                        <h6>{order.paymentMethod}</h6>
-                      </div>
+                  <div className="card-body">
+                    {/* Summary */}
+                    <div
+                      className="rounded-4 p-3 mb-3"
+                      style={{ background: "#F8FAFC" }}
+                    >
+                      <div className="row text-center">
+                        <div className="col-6 border-end">
+                          <small className="text-muted d-block">Payment</small>
 
-                      <div className="col-6">
-                        <small className="text-muted">Total</small>
-                        <h5 className="text-success">₹{order.totalAmount}</h5>
+                          <div className="fw-semibold">
+                            {order.paymentMethod}
+                          </div>
+                        </div>
+
+                        <div className="col-6">
+                          <small className="text-muted d-block">
+                            Total Amount
+                          </small>
+
+                          <h4 className="text-success fw-bold mb-0">
+                            ₹{order.totalAmount}
+                          </h4>
+                        </div>
                       </div>
                     </div>
 
-                    <hr />
-
-                    <h6 className="fw-bold mb-3">Products</h6>
+                    <h6 className="fw-bold mb-3">📦 Products</h6>
 
                     {(expandedProducts[order._id]
                       ? order.products
@@ -117,40 +158,53 @@ const MyOrders = () => {
                     ).map((item, index) => (
                       <div
                         key={index}
-                        className="d-flex align-items-center mb-3"
+                        className="d-flex align-items-center rounded-4 p-2 mb-3"
+                        style={{
+                          background: "#fff",
+                          border: "1px solid #eee",
+                        }}
                       >
                         <img
                           src={item.image}
                           alt={item.name}
                           style={{
-                            width: "60px",
-                            height: "60px",
+                            width: "70px",
+                            height: "70px",
                             objectFit: "cover",
-                            borderRadius: "8px",
+                            borderRadius: "15px",
                           }}
                         />
 
-                        <div className="ms-3">
+                        <div className="ms-3 flex-grow-1">
                           <h6
                             className="mb-1"
                             style={{
-                              fontSize: "14px",
+                              fontSize: "15px",
                             }}
                           >
                             {item.name}
                           </h6>
 
-                          <small>
-                            ₹{item.price} × {item.quantity}
-                          </small>
+                          <div className="text-muted">₹{item.price}</div>
+
+                          <span className="badge bg-dark mt-2">
+                            Qty : {item.quantity}
+                          </span>
+                        </div>
+
+                        <div
+                          className="text-success fw-bold"
+                          style={{ fontSize: "18px" }}
+                        >
+                          ₹{item.price * item.quantity}
                         </div>
                       </div>
                     ))}
 
                     {order.products.length > 3 && (
-                      <div className="text-center">
+                      <div className="text-center mt-3">
                         <button
-                          className="btn btn-outline-primary btn-sm"
+                          className="btn btn-dark rounded-pill px-4"
                           onClick={() =>
                             setExpandedProducts((prev) => ({
                               ...prev,
@@ -159,11 +213,23 @@ const MyOrders = () => {
                           }
                         >
                           {expandedProducts[order._id]
-                            ? "Show Less ▲"
-                            : `Show ${order.products.length - 3} More ▼`}
+                            ? "▲ Show Less"
+                            : `▼ View ${order.products.length - 3} More`}
                         </button>
                       </div>
                     )}
+                  </div>
+
+                  <div className="card-footer bg-white border-0">
+                    <div className="d-flex justify-content-between align-items-center">
+                      <small className="text-muted">
+                        {order.products.length} Item(s)
+                      </small>
+
+                      <span className="text-primary fw-semibold">
+                        Thank You ❤️
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
