@@ -20,7 +20,7 @@ const app = express();
 app.use(
   cors({
     origin: [
-      "https://mini-ecommerce-frontend-git3.onrender.com",
+      "https://mini-ecommerce-myzj652fm-sakshi-6726.vercel.app/",
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
