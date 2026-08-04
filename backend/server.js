@@ -20,8 +20,6 @@ const app = express();
 app.use(
   cors({
     origin: [
-      "http://localhost:5173",
-      "http://127.0.0.1:2600",
       "https://mini-ecommerce-frontend-git3.onrender.com",
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
