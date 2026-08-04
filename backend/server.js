@@ -16,11 +16,10 @@ dotenv.config();
 import transporter from "./config/nodemailer.js";
 
 const app = express();
-
 app.use(
   cors({
     origin: [
-      "https://mini-ecommerce-myzj652fm-sakshi-6726.vercel.app/",
+      "https://mini-ecommerce-myzj652fm-sakshi-6726.vercel.app",
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
