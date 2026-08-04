@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { getAllOrders, updateOrderStatus, deleteOrder } from "../services/api";
+
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
-  const [selectedOrder, setSelectedOrder] = useState(null);
   const [expandedProducts, setExpandedProducts] = useState({});
-
   const [currentPage, setCurrentPage] = useState(1);
 
   const ordersPerPage = 12;
+
   const indexOfLastOrder = currentPage * ordersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
 
@@ -50,10 +50,6 @@ const AdminOrders = () => {
 
       alert("Order deleted successfully");
 
-      if (selectedOrder === id) {
-        setSelectedOrder(null);
-      }
-
       fetchOrders();
     } catch (error) {
       console.log(error);
@@ -62,207 +58,277 @@ const AdminOrders = () => {
   };
 
   return (
-    <div className="container py-4">
-      <h2 className="mb-4 fw-bold">All Orders</h2>
-      <>
-        <div className="row g-4">
-          {currentOrders.map((order) => (
+    <div className="container-fluid py-4">
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2 className="fw-bold mb-0">📦 Orders Dashboard</h2>
+
+          <small className="text-muted">Manage customer orders</small>
+        </div>
+
+        <div className="badge bg-dark fs-6 p-3 rounded-pill">
+          Total Orders : {orders.length}
+        </div>
+      </div>
+
+      <div className="row g-4">
+        {currentOrders.map((order) => (
+          <div className="col-xl-4 col-lg-6 col-md-6" key={order._id}>
             <div
-              className="col-xl-4 col-lg-4 col-md-6 col-sm-6 col-12"
-              key={order._id}
+              className="card border-0 h-100"
+              style={{
+                borderRadius: "22px",
+                overflow: "hidden",
+                transition: ".3s",
+                boxShadow: "0 12px 30px rgba(0,0,0,.08)",
+                cursor: "pointer",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-8px)";
+                e.currentTarget.style.boxShadow = "0 22px 45px rgba(0,0,0,.15)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 12px 30px rgba(0,0,0,.08)";
+              }}
             >
-              <div
-                className="card shadow-sm border-0 h-100 position-relative"
-                style={{ borderRadius: "15px" }}
+              <button
+                className="btn btn-danger position-absolute"
+                style={{
+                  top: 15,
+                  right: 15,
+                  width: 38,
+                  height: 38,
+                  borderRadius: "50%",
+                  zIndex: 10,
+                }}
+                onClick={() => removeOrder(order._id)}
               >
-                <button
-                  className="btn btn-danger btn-sm position-absolute"
+                ✕
+              </button>
+
+              <div
+                className="text-white p-4"
+                style={{
+                  background: "linear-gradient(135deg,#2563EB,#4F46E5,#7C3AED)",
+                }}
+              >
+                <div className="d-flex justify-content-between">
+                  <div>
+                    <h5 className="fw-bold mb-1">
+                      {order.user?.name || "Customer"}
+                    </h5>
+
+                    <small>{order.user?.email}</small>
+                  </div>
+
+                  <span
+                    className={`badge rounded-pill px-3 py-2 ${
+                      order.orderStatus === "Delivered"
+                        ? "bg-success"
+                        : order.orderStatus === "Shipped"
+                          ? "bg-info"
+                          : order.orderStatus === "Processing"
+                            ? "bg-warning text-dark"
+                            : "bg-light text-dark"
+                    }`}
+                  >
+                    {order.orderStatus}
+                  </span>
+                </div>
+              </div>
+
+              <div className="card-body">
+                {/* Payment Summary */}
+
+                <div
+                  className="rounded-4 p-3 mb-4"
                   style={{
-                    top: "10px",
-                    right: "10px",
-                    width: "30px",
-                    height: "30px",
-                    borderRadius: "50%",
-                    padding: "0",
-                    zIndex: 10,
+                    background: "#F8FAFC",
+                    border: "1px solid #E5E7EB",
                   }}
-                  onClick={() => removeOrder(order._id)}
                 >
-                  ✕
-                </button>
+                  <div className="row text-center">
+                    <div className="col-6 border-end">
+                      <small className="text-muted d-block">Payment</small>
 
-                <div className="card-body">
-                  <div className="row">
-                    {/* LEFT SIDE */}
-                    <div className="col-md-6 border-end">
-                      <h5 className="fw-bold mb-3">
-                        {order.user?.name || "Customer"}
-                      </h5>
-
-                      <p className="mb-1">
-                        <strong>Email:</strong>
-                        <br />
-                        {order.user?.email}
-                      </p>
-
-                      <hr />
-
-                      <div className="row text-center mb-3">
-                        <div className="col-6 border-end">
-                          <small className="text-muted">Payment</small>
-
-                          <h6>{order.paymentMethod}</h6>
-                        </div>
-
-                        <div className="col-6">
-                          <small className="text-muted">Total</small>
-
-                          <h5 className="text-success">₹{order.totalAmount}</h5>
-                        </div>
-                      </div>
-
-                      <hr />
-
-                      <h6 className="fw-bold">Shipping</h6>
-
-                      <p className="mb-1">{order.shippingAddress.fullName}</p>
-
-                      <p className="mb-1">{order.shippingAddress.phone}</p>
-
-                      <p className="mb-1">{order.shippingAddress.address}</p>
-
-                      <p className="mb-1">
-                        {order.shippingAddress.city},{" "}
-                        {order.shippingAddress.state}
-                      </p>
-
-                      <p className="mb-0">{order.shippingAddress.pincode}</p>
+                      <h6 className="fw-bold mt-1">{order.paymentMethod}</h6>
                     </div>
 
-                    {/* RIGHT SIDE */}
+                    <div className="col-6">
+                      <small className="text-muted d-block">Total</small>
 
-                    <div className="col-md-6">
-                      <h5 className="fw-bold mb-3">Products</h5>
-
-                      {(expandedProducts[order._id]
-                        ? order.products
-                        : order.products.slice(0, 3)
-                      ).map((item) => (
-                        <div
-                          key={item.product}
-                          className="d-flex align-items-center mb-3"
-                        >
-                          <img
-                            src={item.image}
-                            alt={item.name}
-                            style={{
-                              width: "60px",
-                              height: "60px",
-                              objectFit: "cover",
-                              borderRadius: "8px",
-                            }}
-                          />
-
-                          <div className="ms-3">
-                            <h6 className="mb-1">{item.name}</h6>
-
-                            <small>
-                              ₹{item.price} × {item.quantity}
-                            </small>
-                          </div>
-                        </div>
-                      ))}
-
-                      {order.products.length > 3 && (
-                        <div className="text-center mb-3">
-                          <button
-                            className="btn btn-outline-primary btn-sm"
-                            onClick={() =>
-                              setExpandedProducts((prev) => ({
-                                ...prev,
-                                [order._id]: !prev[order._id],
-                              }))
-                            }
-                          >
-                            {expandedProducts[order._id]
-                              ? "Show Less ▲"
-                              : `Show ${order.products.length - 3} More ▼`}
-                          </button>
-                        </div>
-                      )}
-
-                      <hr />
-
-                      <h6 className="fw-bold">Order Status</h6>
-
-                      <select
-                        className="form-select"
-                        value={order.orderStatus}
-                        onChange={(e) =>
-                          changeStatus(order._id, e.target.value)
-                        }
-                      >
-                        <option value="Pending">Pending</option>
-                        <option value="Processing">Processing</option>
-                        <option value="Shipped">Shipped</option>
-                        <option value="Delivered">Delivered</option>
-                      </select>
+                      <h4 className="fw-bold text-success mb-0">
+                        ₹{order.totalAmount}
+                      </h4>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
 
-        {totalPages > 1 && (
-          <div className="d-flex justify-content-center mt-4">
-            <nav>
-              <ul className="pagination">
-                <li
-                  className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+                {/* Shipping Address */}
+
+                <div
+                  className="rounded-4 p-3 mb-4"
+                  style={{
+                    background: "#FFF7ED",
+                    border: "1px solid #FED7AA",
+                  }}
                 >
-                  <button
-                    className="page-link"
-                    onClick={() => setCurrentPage((prev) => prev - 1)}
-                  >
-                    Previous
-                  </button>
-                </li>
+                  <h6 className="fw-bold mb-3">📍 Shipping Address</h6>
 
-                {[...Array(totalPages)].map((_, index) => (
-                  <li
-                    key={index}
-                    className={`page-item ${
-                      currentPage === index + 1 ? "active" : ""
-                    }`}
+                  <p className="mb-1 fw-semibold">
+                    {order.shippingAddress.fullName}
+                  </p>
+
+                  <small className="text-muted d-block mb-1">
+                    📞 {order.shippingAddress.phone}
+                  </small>
+
+                  <small className="text-muted d-block mb-1">
+                    🏠 {order.shippingAddress.address}
+                  </small>
+
+                  <small className="text-muted d-block">
+                    {order.shippingAddress.city}, {order.shippingAddress.state}{" "}
+                    -{order.shippingAddress.pincode}
+                  </small>
+                </div>
+
+                {/* Products */}
+
+                <h5 className="fw-bold mb-3">🛍 Ordered Products</h5>
+
+                {(expandedProducts[order._id]
+                  ? order.products
+                  : order.products.slice(0, 3)
+                ).map((item) => (
+                  <div
+                    key={item.product}
+                    className="d-flex align-items-center mb-3 p-2 rounded-4"
+                    style={{
+                      border: "1px solid #ECECEC",
+                      background: "#fff",
+                    }}
                   >
-                    <button
-                      className="page-link"
-                      onClick={() => setCurrentPage(index + 1)}
-                    >
-                      {index + 1}
-                    </button>
-                  </li>
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      style={{
+                        width: "75px",
+                        height: "75px",
+                        objectFit: "cover",
+                        borderRadius: "15px",
+                      }}
+                    />
+
+                    <div className="ms-3 flex-grow-1">
+                      <h6 className="mb-1">{item.name}</h6>
+
+                      <small className="text-muted">₹{item.price}</small>
+
+                      <div>
+                        <span className="badge bg-dark mt-2">
+                          Qty : {item.quantity}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="text-end">
+                      <div className="fw-bold text-success">
+                        ₹{item.price * item.quantity}
+                      </div>
+                    </div>
+                  </div>
                 ))}
 
+                {order.products.length > 3 && (
+                  <div className="text-center mb-4">
+                    <button
+                      className="btn btn-outline-dark rounded-pill px-4"
+                      onClick={() =>
+                        setExpandedProducts((prev) => ({
+                          ...prev,
+                          [order._id]: !prev[order._id],
+                        }))
+                      }
+                    >
+                      {expandedProducts[order._id]
+                        ? "▲ Show Less"
+                        : `▼ Show ${order.products.length - 3} More`}
+                    </button>
+                  </div>
+                )}
+
+                <hr className="my-4" />
+
+                <h6 className="fw-bold mb-2">🚚 Update Order Status</h6>
+
+                <select
+                  className="form-select rounded-pill border-primary"
+                  value={order.orderStatus}
+                  onChange={(e) => changeStatus(order._id, e.target.value)}
+                >
+                  <option value="Pending">🟠 Pending</option>
+
+                  <option value="Processing">🔵 Processing</option>
+
+                  <option value="Shipped">🚚 Shipped</option>
+
+                  <option value="Delivered">✅ Delivered</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {totalPages > 1 && (
+        <div className="d-flex justify-content-center mt-5">
+          <nav>
+            <ul className="pagination shadow rounded overflow-hidden">
+              <li
+                className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+              >
+                <button
+                  className="page-link px-4"
+                  onClick={() => setCurrentPage((prev) => prev - 1)}
+                >
+                  ← Previous
+                </button>
+              </li>
+
+              {[...Array(totalPages)].map((_, index) => (
                 <li
+                  key={index}
                   className={`page-item ${
-                    currentPage === totalPages ? "disabled" : ""
+                    currentPage === index + 1 ? "active" : ""
                   }`}
                 >
                   <button
                     className="page-link"
-                    onClick={() => setCurrentPage((prev) => prev + 1)}
+                    onClick={() => setCurrentPage(index + 1)}
                   >
-                    Next
+                    {index + 1}
                   </button>
                 </li>
-              </ul>
-            </nav>
-          </div>
-        )}
-      </>
+              ))}
+
+              <li
+                className={`page-item ${
+                  currentPage === totalPages ? "disabled" : ""
+                }`}
+              >
+                <button
+                  className="page-link px-4"
+                  onClick={() => setCurrentPage((prev) => prev + 1)}
+                >
+                  Next →
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      )}
     </div>
   );
 };
