@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Swal from "sweetalert2";
+import { getProductById, fetchProducts } from "../services/api";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -19,16 +20,16 @@ const ProductDetails = () => {
 
   const fetchProduct = async () => {
     try {
-      const res = await API.get(`/api/products/${id}`);
-      setProduct(res.data);
+      const { data } = await getProductById(id);
+      setProduct(data);
     } catch (err) {
       console.error("Error fetching product:", err);
     }
   };
   const relatedProducts = async () => {
     try {
-      const res = await API.get("/api/products");
-      setProducts(res.data);
+      const { data } = await fetchProducts();
+      setProducts(data);
     } catch (err) {
       console.error("Error fetching related products:", err);
     }
