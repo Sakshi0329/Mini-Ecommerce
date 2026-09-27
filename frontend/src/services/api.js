@@ -38,11 +38,12 @@ export const deleteOrder = (id) => API.delete(`/api/orders/${id}`);
 export const sendContact = (data) => API.post("/api/contact", data);
 export const getContacts = () => API.get("/api/contact");
 export const deleteContact = (id) => API.delete(`/api/contact/${id}`);
-export const getProductById = (id) =>
-  API.get(`/api/products/${id}`);
+
 // Products Endpoints
 export const fetchProducts = (search = "", admin = false) =>
   API.get(`/api/products?search=${search}&admin=${admin}`);
+export const getProductById = (id) =>
+  API.get(`/api/products/${id}`);
 export const deleteProduct = (id) => API.delete(`/api/products/${id}`);
 export const updateProduct = (id, productData) =>
   API.put(`/api/products/${id}`, productData);
