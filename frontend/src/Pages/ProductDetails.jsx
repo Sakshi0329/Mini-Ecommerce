@@ -19,18 +19,18 @@ const ProductDetails = () => {
 
   const fetchProduct = async () => {
     try {
-      const res = await API.get(`/products/${id}`);
+      const res = await API.get(`/api/products/${id}`);
       setProduct(res.data);
     } catch (err) {
-      console.log(err);
+      console.error("Error fetching product:", err);
     }
   };
   const relatedProducts = async () => {
     try {
-      const res = await API.get("/products");
+      const res = await API.get("/api/products");
       setProducts(res.data);
     } catch (err) {
-      console.log(err);
+      console.error("Error fetching related products:", err);
     }
   };
   const addToCart = () => {
